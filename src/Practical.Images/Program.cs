@@ -1,41 +1,39 @@
-﻿using SixLabors.ImageSharp.Formats.Bmp;
+﻿using ImageMagick;
+using OpenCvSharp;
 using SkiaSharp;
 using System.Drawing;
 
 
-var fileName = "C:\\Users\\Phong.NguyenDoan\\Downloads\\image_2024_08_06T07_51_43_296Z.png";
+var fileName = "C:\\Users\\Phong.NguyenDoan\\Downloads\\0CA60F60-1091-456B-9F91-28DF9D65D428.jpg";
 
 using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 {
-    Bitmap imagePath = (Bitmap)System.Drawing.Image.FromStream(stream, true);
+    Bitmap imagePath = (Bitmap)Image.FromStream(stream, true);
     Console.WriteLine($"Width: {imagePath.Width} Height: {imagePath.Height}");
-
-    using (MemoryStream m = new MemoryStream())
-    {
-        imagePath.Save(m, imagePath.RawFormat);
-        byte[] imageBytes = m.ToArray();
-
-        var text1 = Convert.ToBase64String(imageBytes);
-        var text2 = Convert.ToBase64String(File.ReadAllBytes(fileName));
-    }
 }
 
-using (SixLabors.ImageSharp.Image image = SixLabors.ImageSharp.Image.Load(fileName))
+using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+using (SixLabors.ImageSharp.Image image = SixLabors.ImageSharp.Image.Load(stream))
 {
     Console.WriteLine($"Width: {image.Width} Height: {image.Height}");
-
-    using (MemoryStream m = new MemoryStream())
-    {
-        image.Save(m, new BmpEncoder());
-        byte[] imageBytes = m.ToArray();
-
-        var text1 = Convert.ToBase64String(imageBytes);
-        var text2 = Convert.ToBase64String(File.ReadAllBytes(fileName));
-    }
 }
 
 using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 {
     var skBitmap = SKBitmap.Decode(stream);
     Console.WriteLine($"Width: {skBitmap.Width} Height: {skBitmap.Height}");
+}
+
+using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+using (var image = new MagickImage(stream))
+{
+    Console.WriteLine($"Width: {image.Width} Height: {image.Height}");
+}
+
+using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+using (var ms = new MemoryStream())
+{
+    stream.CopyTo(ms);
+    using Mat image = Cv2.ImDecode(ms.ToArray(), ImreadModes.Color);
+    Console.WriteLine($"Width: {image.Width} Height: {image.Height}");
 }
